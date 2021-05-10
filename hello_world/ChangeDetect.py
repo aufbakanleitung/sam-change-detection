@@ -34,10 +34,10 @@ def hash_site(url, unchanged_hash):
         return True
 
 
-def post_message_to_slack(text, slack_webhook):
+def post_message_to_slack(text, SLACK_WEBHOOK):
     slack_data = {'text': text}
     response = requests.post(
-               slack_webhook,
+               SLACK_WEBHOOK,
                data=json.dumps(slack_data),
                headers={'Content-Type': 'application/json'})
     if response.status_code != 200:
@@ -51,11 +51,12 @@ def post_message_to_slack(text, slack_webhook):
 
 def lambda_handler(event, context):
     url = event['url']
-    slack_webhook = os.environ.get('slack_webhook')
+    # os.environ['SLACK_WEBHOOK'] = "https://hooks.slack.com/services/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"
+    SLACK_WEBHOOK = os.environ.get('SLACK_WEBHOOK')
     phone_nr = os.environ.get('phone_nr')
     if event['check_type'] == "html":
         if check_html(url, event['check_line'], event['original_element']):
-            post_message_to_slack(f"{url} html change detected", slack_webhook)
+            post_message_to_slack(f"{url} html change detected", SLACK_WEBHOOK)
             # boto3.client('sns').publish(PhoneNumber=phone_nr, Message=event['message'])
             return 'html change found!'
         else:
@@ -63,7 +64,7 @@ def lambda_handler(event, context):
 
     if event['check_type'] == "hash":
         if hash_site(url, event['unchanged_hash']):
-            post_message_to_slack(f"{url} hash change detected", slack_webhook)
+            post_message_to_slack(f"{url} hash change detected", SLACK_WEBHOOK)
             # boto3.client('sns').publish(PhoneNumber=phone_nr, Message=event['message'])
             return 'Hash change found!'
         else:
@@ -92,4 +93,4 @@ tuinwijck_event = {
     "unchanged_hash": "845124c335ba7e9091b3b739dae67ec6055de3d027b0093e5f2a7859"
 }
 
-lambda_handler(tuinwijck_event, "context")
+# lambda_handler(tuinwijck_event, "context")

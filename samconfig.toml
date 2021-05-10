@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "sam-change-detect"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1rprb8q87a8bl"
+s3_prefix = "sam-change-detect"
+region = "eu-west-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
