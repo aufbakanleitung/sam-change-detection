@@ -66,7 +66,7 @@ def lambda_handler(event, context):
     SLACK_WEBHOOK = os.environ.get('SLACK_WEBHOOK')
     phone_nr = os.environ.get('phone_nr')
 
-    #checktypes: html/hash/search
+    # Check types: html/hash/search
     if event['check_type'] == "html":
         if check_html(url, event['check_line'], event['original_element']):
             post_message_to_slack(f"{url} html change detected", SLACK_WEBHOOK)
