@@ -43,6 +43,8 @@ sam build
 sam local invoke "ChangeDetectFunction" -e tests/tuinwijck.json --env-vars env.json
 ```
 
+The env.json contains the SLACK_WEBHOOK variable, and is not included in the repository for security reasons. Add your own webhook to test.
+
 ## Deploy
 The infrastucture as code is defined in the template.yaml in SAM Cloudformation code. You can deploy like this:
 ```bash
