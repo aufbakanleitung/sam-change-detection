@@ -1,6 +1,8 @@
 # Sam Change detection
-This is a simple serverless Python script that periodically checks websites for changes, and it is deployed using AWS SAM.
-It is triggered by the AWS EventBridge that sends it the configuration in a json file. If a change is detected it sends a Slack message, the channel is configured in the environment variables.
+This is a simple serverless Python script that periodically checks websites for changes, and sends a Slack message when a change is detected. It is deployed using AWS SAM.
+
+
+The lambda is triggered by the AWS EventBridge that sends it the configuration in a json file. It then compares the given value to a hash of the site, by checking a specific html element, or by searching for a sentence.
 The json should be structured like so:
 - _checktype: hash/html/search_
 - _url: https://www.example.nl_
@@ -8,6 +10,8 @@ The json should be structured like so:
 
 _Example:_
 `{"check_type": "hash", "url": "https://www.hvdveer.nl", "unchanged_hash": "015c0f79ba863036c0b08d60f56a5601f65d326961feffd110dce526"}`
+
+
 
 ## Structure
 The project structure is based on a cookiecutter set-up for Lambda functions:
