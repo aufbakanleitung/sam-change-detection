@@ -34,6 +34,18 @@ def hash_site(url, unchanged_hash):
         return True
 
 
+def find_on_site(url, sentence):
+    req = requests.Request(url, headers={'User-Agent': 'AWS Lambda'})
+    site = str(urlopen(req).read())
+    if sentence in site:
+        print(f"Expected '{sentence}' found at {str(datetime.now())} on {url}.")
+        return False
+    else:
+        print("changes detected")
+        print(f"{sentence} not found at {str(datetime.now())} on {url}.")
+        return True
+
+
 def post_message_to_slack(text, SLACK_WEBHOOK):
     slack_data = {'text': text}
     response = requests.post(
@@ -53,10 +65,11 @@ def lambda_handler(event, context):
     url = event['url']
     SLACK_WEBHOOK = os.environ.get('SLACK_WEBHOOK')
     phone_nr = os.environ.get('phone_nr')
+
+    #checktypes: html/hash/search
     if event['check_type'] == "html":
         if check_html(url, event['check_line'], event['original_element']):
             post_message_to_slack(f"{url} html change detected", SLACK_WEBHOOK)
-            # boto3.client('sns').publish(PhoneNumber=phone_nr, Message=event['message'])
             return 'html change found!'
         else:
             return f'No html changes detected for {url}'
@@ -69,22 +82,16 @@ def lambda_handler(event, context):
         else:
             return f'No hash changes detected for {url}'
 
+    if event['check_type'] == "search":
+        if find_on_site(url, event['sentence']):
+            post_message_to_slack(f"{url} hash change detected", SLACK_WEBHOOK)
+            return 'Hash change found!'
+        else:
+            return f'No hash changes detected for {url}'
+
     else:
         return "No checktype provided: html or hash"
 
-
-piccardthof_event = {
-    "check_type": "html",
-    "url": "https://www.piccardthof.nl/huisjes-te-koop/",
-    "check_line": "<h6>Er zijn op dit moment geen huisjes te koop</h6>",
-    "original_element": "h6"
-}
-
-hvdveer_event = {
-    "check_type": "hash",
-    "url": "https://www.hvdveer.nl",
-    "unchanged_hash": "b624597f6baf137d5416f5c75a4a4ab61097e58fdb73feea422fd836"
-}
 
 tuinwijck_event = {
     "check_type": "hash",
@@ -92,4 +99,4 @@ tuinwijck_event = {
     "unchanged_hash": "845124c335ba7e9091b3b739dae67ec6055de3d027b0093e5f2a7859"
 }
 
-lambda_handler(tuinwijck_event, "context")
+# lambda_handler(tuinwijck_event, "context")
