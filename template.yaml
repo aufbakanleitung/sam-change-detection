@@ -18,11 +18,24 @@ Resources:
       Handler: ChangeDetect.lambda_handler
       Runtime: python3.8
       Events:
-        ScheduledEvent:
+        Hvdveer5min:
           Type: Schedule
           Properties:
-            Schedule: rate(5 minute)
+            Name: Hvdveer5min
+            Schedule: rate(5 minutes)
             Input: '{"check_type": "hash", "url": "https://www.hvdveer.nl", "unchanged_hash": "015c0f79ba863036c0b08d60f56a5601f65d326961feffd110dce526"}'
+        Tuinwijck5min:
+          Type: Schedule
+          Properties:
+            Name: Tuinwijck5min
+            Schedule: rate(5 minutes)
+            Input: '{"check_type": "hash", "url": "https://www.tuinwijck.nl/huisjes-te-koop/", "unchanged_hash": "8a12e07e53901157e957a72feada52d389f8e6d0f3ccae384c4ce66a" }'
+        Piccardhof5min:
+          Type: Schedule
+          Properties:
+            Name: Piccardhof5min
+            Schedule: cron(*/5 6-22 * * ? *)
+            Input: '{"check_type": "html", "url": "https://www.piccardthof.nl/huisjes-te-koop/", "check_line": "<h6>Er zijn op dit moment geen huisjes te koop</h6>",   "original_element": "h6"}'
         ChangeDetect:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
