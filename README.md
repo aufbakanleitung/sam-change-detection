@@ -24,7 +24,7 @@ The application uses several AWS resources, including Lambda functions and an Ev
 
 This is what it looks like in AWS:
 
-![img_1.png](img_1.png)
+![img_1.png](lambda-screenshot.png)
 
 ## Run locally
 
