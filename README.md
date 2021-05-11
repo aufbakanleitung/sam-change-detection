@@ -1,6 +1,7 @@
-# Sam Change detection
-This is a simple serverless Python script that periodically checks websites for changes, and sends a Slack message when a change is detected. It is deployed using AWS SAM.
+# Sam Change Detection
+This is a simple serverless Python script that periodically checks websites for changes, and sends a Slack message when a change is detected. It is deployed using AWS SAM (Serverless Application Model).
 
+![img_1.png](aws_sam.png)
 
 The lambda is triggered by the AWS EventBridge that sends it the configuration in a json file. It then compares the given value to a hash of the site, by checking a specific html element, or by searching for a sentence.
 The json should be structured like so:
@@ -35,6 +36,7 @@ To use the SAM CLI, you need the following tools.
 * SAM CLI - [Install the SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
 * [Python 3 installed](https://www.python.org/downloads/)
 * Docker - [Install Docker community edition](https://hub.docker.com/search/?type=edition&offering=community)
+* An AWS account
 
 To build and test the application run the following commands
 
