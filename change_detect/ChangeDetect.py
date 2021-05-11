@@ -51,7 +51,6 @@ def post_message_to_slack(text, SLACK_WEBHOOK):
 
 def lambda_handler(event, context):
     url = event['url']
-    # os.environ['SLACK_WEBHOOK'] = "https://hooks.slack.com/services/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"
     SLACK_WEBHOOK = os.environ.get('SLACK_WEBHOOK')
     phone_nr = os.environ.get('phone_nr')
     if event['check_type'] == "html":
@@ -93,4 +92,4 @@ tuinwijck_event = {
     "unchanged_hash": "845124c335ba7e9091b3b739dae67ec6055de3d027b0093e5f2a7859"
 }
 
-# lambda_handler(tuinwijck_event, "context")
+lambda_handler(tuinwijck_event, "context")
