@@ -9,10 +9,12 @@ The json should be structured like so:
 - _url: https://www.example.nl_
 - _check_variable: unchanged_hash/check_line/sentence_
 
-_Example:_
-`{"check_type": "hash", "url": "https://www.hvdveer.nl", "unchanged_hash": "015c0f79ba863036c0b08d60f56a5601f65d326961feffd110dce526"}`
+_Examples:_
 
-
+- Hash:   `{"check_type": "hash",   "url": "https://www.hvdveer.nl", "unchanged_hash": "015c0f79ba863036c0b08d60f56a5601f65d326961feffd110dce526"}`
+- Search: `{"check_type": "search", "url": "https://www.hvdveer.nl", "check_line": "cloud"}`
+- HTML:   `{"check_type": "html",   "url": "https://www.piccardthof.nl/huisjes-te-koop/",
+          "check_line": "<h6>Er zijn op dit moment geen huisjes te koop</h6>", "original_element": "h6"}`
 
 ## Structure
 The project structure is based on a cookiecutter set-up for Lambda functions:
@@ -21,7 +23,31 @@ The project structure is based on a cookiecutter set-up for Lambda functions:
 - tests - Unit tests for the application code. 
 - template.yaml - SAM cloudformation code that sets-up the AWS resources.
 
-The application uses several AWS resources, including Lambda functions and an EventBridge. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code.
+The application uses several AWS resources, including Lambda functions and an EventBridge. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code. The json search strings should be added to the template.yaml.
+
+Example:
+```yaml
+Resources:
+  ChangeDetectFunction:
+    Name: Sam-change-detector
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: change_detect/
+      Handler: ChangeDetect.lambda_handler
+      Runtime: python3.8
+      Events:
+        Hvdveer5min:
+          Type: Schedule
+          Properties:
+            Name: Hvdveer5min
+            Schedule: rate(5 minutes)
+            Input: '{"check_type": "hash", "url": "https://www.hvdveer.nl", "unchanged_hash": "015c0f79ba863036c0b08d60f56a5601f65d326961feffd110dce526"}'
+      Environment:
+        Variables:
+          SLACK_WEBHOOK: webhook_secret
+```      
+
+
 
 This is what it looks like in AWS:
 
@@ -44,6 +70,8 @@ To build and test the application run the following commands
 sam build 
 sam local invoke "ChangeDetectFunction" -e tests/tuinwijck.json --env-vars env.json
 ```
+
+The env.json contains the SLACK_WEBHOOK variable, and is not included in the repository for security reasons. Add your own webhook to test.
 
 ## Deploy
 The infrastucture as code is defined in the template.yaml in SAM Cloudformation code. You can deploy like this:
