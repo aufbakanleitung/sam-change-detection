@@ -34,19 +34,19 @@ def hash_site(url, unchanged_hash):
         return True
 
 
-def find_on_site(url, sentence):
-    req = requests.Request(url, headers={'User-Agent': 'AWS Lambda'})
-    site = str(urlopen(req).read())
-    if sentence in site:
-        print(f"Expected '{sentence}' found at {str(datetime.now())} on {url}.")
+def find_on_site(url, check_line):
+    site = str(urlopen(url).read())
+    pprint(site)
+    if check_line in site:
+        print(f"Expected '{check_line}' found at {url}.")
         return False
     else:
         print("changes detected")
-        print(f"{sentence} not found at {str(datetime.now())} on {url}.")
+        print(f"{check_line} not found at {url}.")
         return True
 
 
-def post_message_to_slack(text, SLACK_WEBHOOK):
+def post_message_to_slack(text, SLACK_WEBHOOK, check_type):
     slack_data = {'text': text}
     response = requests.post(
                SLACK_WEBHOOK,
@@ -58,7 +58,8 @@ def post_message_to_slack(text, SLACK_WEBHOOK):
             % (response.status_code, response.text)
         )
     else:
-        return "Slack message send"
+        print("Slack message send", text)
+        return f"{check_type} change found!"
 
 
 def lambda_handler(event, context):
@@ -66,31 +67,28 @@ def lambda_handler(event, context):
     SLACK_WEBHOOK = os.environ.get('SLACK_WEBHOOK')
     phone_nr = os.environ.get('phone_nr')
 
-    # Check types: html/hash/search
+    # Differentiate check types: html/hash/search
     if event['check_type'] == "html":
         if check_html(url, event['check_line'], event['original_element']):
-            post_message_to_slack(f"{url} html change detected", SLACK_WEBHOOK)
-            return 'html change found!'
+            return post_message_to_slack(f"{url} html change detected", SLACK_WEBHOOK, event['check_type'])
         else:
             return f'No html changes detected for {url}'
 
     if event['check_type'] == "hash":
         if hash_site(url, event['unchanged_hash']):
-            post_message_to_slack(f"{url} hash change detected", SLACK_WEBHOOK)
             # boto3.client('sns').publish(PhoneNumber=phone_nr, Message=event['message'])
-            return 'Hash change found!'
+            return post_message_to_slack(f"{url} hash change detected", SLACK_WEBHOOK, event['check_type'])
         else:
             return f'No hash changes detected for {url}'
 
     if event['check_type'] == "search":
-        if find_on_site(url, event['sentence']):
-            post_message_to_slack(f"{url} hash change detected", SLACK_WEBHOOK)
-            return 'Hash change found!'
+        if find_on_site(url, event['check_line']):
+            return f"Found expected sentence at {url}: {event['check_line']}"
         else:
-            return f'No hash changes detected for {url}'
+            return post_message_to_slack(f"Search change detected. Didn't find {event['check_line']} at {url}.", SLACK_WEBHOOK, event['check_type'])
 
     else:
-        return "No checktype provided: html or hash"
+        return "No checktype provided, should be: html/hash/search"
 
 
 tuinwijck_event = {
@@ -99,4 +97,9 @@ tuinwijck_event = {
     "unchanged_hash": "845124c335ba7e9091b3b739dae67ec6055de3d027b0093e5f2a7859"
 }
 
-# lambda_handler(tuinwijck_event, "context")
+piccardhof = {
+    "check_type": "search",
+    "url": "https://www.piccardthof.nl/huisjes-te-koop/",
+    "check_line": "ER ZIJN OP DIT MOMENT GEEN HUISJES TE KOOP"
+}
+lambda_handler(piccardhof, "context")
