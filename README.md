@@ -10,9 +10,9 @@ The json should be structured like so:
 
 _Examples:_
 
-Hash:   `{"check_type": "hash",   "url": "https://www.hvdveer.nl", "unchanged_hash": "015c0f79ba863036c0b08d60f56a5601f65d326961feffd110dce526"}`
-Search: `{"check_type": "search", "url": "https://www.hvdveer.nl", "check_line": "cloud"}`
-HTML:   `{"check_type": "html",   "url": "https://www.piccardthof.nl/huisjes-te-koop/",
+- Hash:   `{"check_type": "hash",   "url": "https://www.hvdveer.nl", "unchanged_hash": "015c0f79ba863036c0b08d60f56a5601f65d326961feffd110dce526"}`
+- Search: `{"check_type": "search", "url": "https://www.hvdveer.nl", "check_line": "cloud"}`
+- HTML:   `{"check_type": "html",   "url": "https://www.piccardthof.nl/huisjes-te-koop/",
           "check_line": "<h6>Er zijn op dit moment geen huisjes te koop</h6>", "original_element": "h6"}`
 
 ## Structure
