@@ -29,7 +29,7 @@ Resources:
           Properties:
             Name: Tuinwijck5min
             Schedule: rate(5 minutes)
-            Input: '{"check_type": "hash", "url": "https://www.tuinwijck.nl/huisjes-te-koop/", "unchanged_hash": "8a12e07e53901157e957a72feada52d389f8e6d0f3ccae384c4ce66a" }'
+            Input: '{"check_type": "hash", "url": "https://www.tuinwijck.nl/huisjes-te-koop/", "unchanged_hash": "d16afd1986df6ed0b7c6f0e4d0b3cd727849bae7e5fa6a8e9447f9fe" }'
         Piccardhof5min:
           Type: Schedule
           Properties:

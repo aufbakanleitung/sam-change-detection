@@ -102,4 +102,4 @@ piccardhof = {
     "url": "https://www.piccardthof.nl/huisjes-te-koop/",
     "check_line": "ER ZIJN OP DIT MOMENT GEEN HUISJES TE KOOP"
 }
-lambda_handler(piccardhof, "context")
+# lambda_handler(piccardhof, "context")
