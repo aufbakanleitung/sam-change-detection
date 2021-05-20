@@ -9,6 +9,11 @@ Globals:
   Function:
     Timeout: 3
 
+Parameters:
+  NotificationEmail:
+    Type: String
+    Default: hvdveer@gmail.com
+
 Resources:
   ChangeDetectFunction:
     Name: Sam-change-detector
@@ -29,7 +34,7 @@ Resources:
           Properties:
             Name: Tuinwijck5min
             Schedule: rate(5 minutes)
-            Input: '{"check_type": "hash", "url": "https://www.tuinwijck.nl/huisjes-te-koop/", "unchanged_hash": "d16afd1986df6ed0b7c6f0e4d0b3cd727849bae7e5fa6a8e9447f9fe" }'
+            Input: '{"check_type": "hash", "url": "https://www.tuinwijck.nl/huisjes-te-koop/", "unchanged_hash": "0a092fae987a05e7ff59420f2773f28dd4a17ce175ed88ce9e372e7f" }'
         Piccardhof5min:
           Type: Schedule
           Properties:

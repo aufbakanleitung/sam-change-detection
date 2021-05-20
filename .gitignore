@@ -2,6 +2,8 @@ package/
 *.zip
 slack.key
 env.json
+.aws-sam/
+.idea/
 
 # Created by https://www.gitignore.io/api/osx,linux,python,windows,pycharm,visualstudiocode
 
