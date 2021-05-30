@@ -94,7 +94,7 @@ def lambda_handler(event, context):
 tuinwijck_event = {
     "check_type": "hash",
     "url": "https://www.tuinwijck.nl/huisjes-te-koop",
-    "unchanged_hash": "845124c335ba7e9091b3b739dae67ec6055de3d027b0093e5f2a7859"
+    "unchanged_hash": "22fdeead39caeb2927af2eae610ddccf38da4c669d4dbbc79a150158"
 }
 
 piccardhof = {
