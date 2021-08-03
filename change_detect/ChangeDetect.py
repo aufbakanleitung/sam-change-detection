@@ -36,7 +36,7 @@ def hash_site(url, unchanged_hash):
 
 def find_on_site(url, check_line):
     site = str(urlopen(url).read())
-    pprint(site)
+    print(site)
     if check_line in site:
         print(f"Expected '{check_line}' found at {url}.")
         return False
@@ -94,7 +94,7 @@ def lambda_handler(event, context):
 tuinwijck_event = {
     "check_type": "hash",
     "url": "https://www.tuinwijck.nl/huisjes-te-koop",
-    "unchanged_hash": "22fdeead39caeb2927af2eae610ddccf38da4c669d4dbbc79a150158"
+    "unchanged_hash": "78191fc6598b36b1dc6a825f09220be62d650a910a06eca75f14338b"
 }
 
 piccardhof = {
@@ -102,4 +102,5 @@ piccardhof = {
     "url": "https://www.piccardthof.nl/huisjes-te-koop/",
     "check_line": "ER ZIJN OP DIT MOMENT GEEN HUISJES TE KOOP"
 }
-lambda_handler(tuinwijck_event, "context")
+
+# lambda_handler(tuinwijck_event, "context")

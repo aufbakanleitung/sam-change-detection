@@ -28,13 +28,14 @@ Resources:
           Properties:
             Name: Hvdveer5min
             Schedule: rate(5 minutes)
+            # TODO: Reference the tests/hvdveer.json here
             Input: '{"check_type": "hash", "url": "https://www.hvdveer.nl", "unchanged_hash": "015c0f79ba863036c0b08d60f56a5601f65d326961feffd110dce526"}'
         Tuinwijck5min:
           Type: Schedule
           Properties:
             Name: Tuinwijck5min
             Schedule: rate(5 minutes)
-            Input: '{"check_type": "hash", "url": "https://www.tuinwijck.nl/huisjes-te-koop/", "unchanged_hash": "22fdeead39caeb2927af2eae610ddccf38da4c669d4dbbc79a150158" }'
+            Input: '{"check_type": "hash", "url": "https://www.tuinwijck.nl/huisjes-te-koop/", "unchanged_hash": "1a7a61eab859adbd1ca8d29bc2ecc7b3a62fcbc02bd982769ca48a5f" }'
         Piccardhof5min:
           Type: Schedule
           Properties:
