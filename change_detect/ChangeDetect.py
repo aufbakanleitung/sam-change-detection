@@ -1,37 +1,39 @@
 import hashlib
 import os
+from pprint import pprint
+
+import boto3
 import requests
 import json
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
-
-def check_html(url, check_line, original_element):
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')
-    current_line = str(soup.find(original_element))
-
-    if current_line == check_line:
-        print("No changes detected")
-        print(f"Current website says: {current_line}")
-        return False
-    else:
-        print("Website changed. Notifying user")
-        print(f"Current website says: {current_line}")
-        return True
-
 
 # Only use if the site has no constantly changing elements such as time
 def hash_site(url, unchanged_hash):
     hashable_response = urlopen(url).read()
     currentHash = hashlib.sha224(hashable_response).hexdigest()
     if currentHash == unchanged_hash:
-        print("No changes detected")
+        print(f"No changes detected at {url}")
         print(f"Current hash {currentHash}")
         return False
     else:
-        print("Website changed. Notifying user")
+        print(f"{url} changed. Notifying user")
         print(f"Current hash {currentHash} \n original hash: {unchanged_hash}")
-        return True
+        return currentHash
+
+
+def check_html(url, check_line, html_element):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    current_line = str(soup.find(html_element))
+
+    if current_line == check_line:
+        print(f"No html changes detected at {url}")
+        return False
+    else:
+        print(f"{url} changed. Notifying user")
+        print(f"Currently {url} says: {current_line}")
+        return current_line
 
 
 def find_on_site(url, check_line):
@@ -46,7 +48,8 @@ def find_on_site(url, check_line):
         return True
 
 
-def post_message_to_slack(text, SLACK_WEBHOOK, check_type):
+def post_message_to_slack(text, check_type):
+    SLACK_WEBHOOK = os.environ.get('SLACK_WEBHOOK')
     slack_data = {'text': text}
     response = requests.post(
                SLACK_WEBHOOK,
@@ -62,33 +65,74 @@ def post_message_to_slack(text, SLACK_WEBHOOK, check_type):
         return f"{check_type} change found!"
 
 
-def lambda_handler(event, context):
-    url = event['url']
-    SLACK_WEBHOOK = os.environ.get('SLACK_WEBHOOK')
-    phone_nr = os.environ.get('phone_nr')
+def read_dynamodb(table_name, id):
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(table_name)
+    item = table.get_item(Key={'id': id})["Item"]
+    print(item)
+    return item
 
+
+def scan_dynamodb(table_name):
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(table_name)
+    items = table.scan()["Items"]
+    return items
+
+
+def write_dynamodb(url, check_type, line, html_element=None):
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table("WebsiteChecktable")
+    response = table.update_item(
+        Key={'url': url},
+        UpdateExpression="set check_type=:c, line=:l, html_element=:h",
+        ExpressionAttributeValues={
+            ':c': check_type,
+            ':l': line,
+            ':h': html_element
+        }
+    )
+    print(f"Successful DynamoDB write to {url} with {line}")
+    print(response)
+# write_dynamodb('https://www.hvdveer.nl', 'hash', '015c0f79ba863036c0b08d60f56a5601f65d326961feffd110dce526')
+
+def check_type(item):
+    url = item["url"]
+    check_type = item['check_type']
     # Differentiate check types: html/hash/search
-    if event['check_type'] == "html":
-        if check_html(url, event['check_line'], event['original_element']):
-            return post_message_to_slack(f"{url} html change detected", SLACK_WEBHOOK, event['check_type'])
+    if item['check_type'] == "html":
+        line = check_html(url, item['line'], item['html_element'])
+        if line:
+            post_message_to_slack(f"{url} {check_type} change detected", check_type)
+            write_dynamodb(url, check_type, line, item['html_element'])
         else:
             return f'No html changes detected for {url}'
 
-    if event['check_type'] == "hash":
-        if hash_site(url, event['unchanged_hash']):
-            # boto3.client('sns').publish(PhoneNumber=phone_nr, Message=event['message'])
-            return post_message_to_slack(f"{url} hash change detected", SLACK_WEBHOOK, event['check_type'])
+    if item['check_type'] == "hash":
+        line = hash_site(url, item['line'])
+        if line:
+            # boto3.client('sns').publish(PhoneNumber=phone_nr, Message=item['message'])
+            post_message_to_slack(f"{url} {check_type} change detected", check_type)
+            write_dynamodb(url, check_type, line)
         else:
             return f'No hash changes detected for {url}'
 
-    if event['check_type'] == "search":
-        if find_on_site(url, event['check_line']):
-            return f"Found expected sentence at {url}: {event['check_line']}"
+    if item['check_type'] == "search":
+        if find_on_site(url, item['line']):
+            return post_message_to_slack(f"{url} {check_type} change detected. Didn't find {item['line']} at {url}.", check_type)
         else:
-            return post_message_to_slack(f"Search change detected. Didn't find {event['check_line']} at {url}.", SLACK_WEBHOOK, event['check_type'])
+            return f"Found expected sentence at {url}: {item['line']}"
 
     else:
         return "No checktype provided, should be: html/hash/search"
+
+
+def lambda_handler():
+    phone_nr = os.environ.get('phone_nr')
+    items = scan_dynamodb("WebsiteChecktable")
+    for item in items:
+        check_type(item)
+
 
 
 tuinwijck_event = {
@@ -100,7 +144,9 @@ tuinwijck_event = {
 piccardhof = {
     "check_type": "search",
     "url": "https://www.piccardthof.nl/huisjes-te-koop/",
-    "check_line": "ER ZIJN OP DIT MOMENT GEEN HUISJES TE KOOP"
+    "line": "ER ZIJN OP DIT MOMENT GEEN HUISJES TE KOOP"
 }
 
-# lambda_handler(tuinwijck_event, "context")
+if __name__ == '__main__':
+    lambda_handler()
+    # read_dynamodb("WebsiteChecklines", "tuinwijck")

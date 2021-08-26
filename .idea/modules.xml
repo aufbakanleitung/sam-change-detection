@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../dynamodb_event_reader/.idea/dynamodb_event_reader.iml" filepath="$PROJECT_DIR$/../dynamodb_event_reader/.idea/dynamodb_event_reader.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/sam-app.iml" filepath="$PROJECT_DIR$/.idea/sam-app.iml" />
     </modules>
   </component>

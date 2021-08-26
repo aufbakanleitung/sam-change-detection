@@ -29,19 +29,19 @@ Resources:
             Name: Hvdveer5min
             Schedule: rate(5 minutes)
             # TODO: Reference the tests/hvdveer.json here
-            Input: '{"check_type": "hash", "url": "https://www.hvdveer.nl", "unchanged_hash": "015c0f79ba863036c0b08d60f56a5601f65d326961feffd110dce526"}'
+            Input: '{"check_type": "hash", "url": "https://www.hvdveer.nl", "line": "015c0f79ba863036c0b08d60f56a5601f65d326961feffd110dce526"}'
         Tuinwijck5min:
           Type: Schedule
           Properties:
             Name: Tuinwijck5min
             Schedule: rate(5 minutes)
-            Input: '{"check_type": "hash", "url": "https://www.tuinwijck.nl/huisjes-te-koop/", "unchanged_hash": "1a7a61eab859adbd1ca8d29bc2ecc7b3a62fcbc02bd982769ca48a5f" }'
+            Input: '{"check_type": "hash", "url": "https://www.tuinwijck.nl/huisjes-te-koop/", "line": "1a7a61eab859adbd1ca8d29bc2ecc7b3a62fcbc02bd982769ca48a5f" }'
         Piccardhof5min:
           Type: Schedule
           Properties:
             Name: Piccardhof5min
             Schedule: cron(*/5 6-22 * * ? *)
-            Input: '{"check_type": "html", "url": "https://www.piccardthof.nl/huisjes-te-koop/", "check_line": "<h6>Er zijn op dit moment geen huisjes te koop</h6>",   "original_element": "h6"}'
+            Input: '{"check_type": "html", "url": "https://www.piccardthof.nl/huisjes-te-koop/", "line": "<h6>Er zijn op dit moment geen huisjes te koop</h6>",   "html_element": "h6"}'
         ChangeDetect:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
@@ -50,6 +50,14 @@ Resources:
       Environment:
         Variables:
           SLACK_WEBHOOK: webhook_secret
+
+  DynamoDB:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: VolkstuinHashTable
+      PrimaryKey:
+        Name: Volkstuin
+        Type: String
 
   AlarmTopic:
     Type: AWS::SNS::Topic
