@@ -1,7 +1,8 @@
 # Sam Change Detection
-This is a simple serverless Python script that periodically checks websites for changes, and sends a Slack message when a change is detected. It is deployed using AWS SAM (Serverless Application Model).
+This is a simple serverless Python script that periodically checks websites for changes, and sends a Slack message when a change is detected. It is tested and deployed using AWS SAM (Serverless Application Model).
 
 ![Change detect architecture](Check%20website%20architecture%20white.png)
+_Serverless architecture of the change detection app_
 
 EventBridge triggers the lambda that loops through all the website json snapshots in DynamoDB. It then compares the given value to a hash of the site, by checking a specific html element, or by searching for a sentence.
 The json should be structured like so:
@@ -9,7 +10,7 @@ The json should be structured like so:
 - _url: https://www.example.nl_
 - _check_variable: unchanged_hash/check_line/sentence_
 
-_Examples:_
+Examples:
 
 - Hash:   `{"check_type": "hash",   "url": "https://www.hvdveer.nl", "unchanged_hash": "015c0f79ba863036c0b08d60f56a5601f65d326961feffd110dce526"}`
 - Search: `{"check_type": "search", "url": "https://www.hvdveer.nl", "check_line": "cloud"}`
@@ -24,34 +25,6 @@ The project structure is based on a cookiecutter set-up for Lambda functions:
 - template.yaml - SAM cloudformation code that sets-up the AWS resources.
 
 The application uses several AWS resources, including Lambda functions and an EventBridge. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code. The json search strings should be added to the template.yaml.
-
-Example:
-```yaml
-Resources:
-  ChangeDetectFunction:
-    Name: Sam-change-detector
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: change_detect/
-      Handler: ChangeDetect.lambda_handler
-      Runtime: python3.8
-      Events:
-        Hvdveer5min:
-          Type: Schedule
-          Properties:
-            Name: Hvdveer5min
-            Schedule: rate(5 minutes)
-            Input: '{"check_type": "hash", "url": "https://www.hvdveer.nl", "unchanged_hash": "015c0f79ba863036c0b08d60f56a5601f65d326961feffd110dce526"}'
-      Environment:
-        Variables:
-          SLACK_WEBHOOK: webhook_secret
-```      
-
-
-
-This is what it looks like in AWS:
-
-![img_1.png](lambda-screenshot.png)
 
 ## Run locally
 
