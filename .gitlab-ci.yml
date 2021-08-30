@@ -1,0 +1,14 @@
+image: python:3.9
+
+stages:
+  - deploy
+
+production:
+  stage: deploy
+  before_script:
+    - pip3 install awscli --upgrade
+    - pip3 install aws-sam-cli --upgrade
+  script:
+    - sam build
+    - sam deploy
+  environment: production
