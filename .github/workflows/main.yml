@@ -23,7 +23,6 @@ jobs:
           aws-region: us-east-2
       # Build inside Docker containers
       - run: sam build
-      - run: pip3 install -r requirements.txt && pytest test/unit
       - run: python3 -m pytest -s -vvv ./tests/unit/
       - run: sam deploy
 
