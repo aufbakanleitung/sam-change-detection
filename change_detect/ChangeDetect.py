@@ -130,11 +130,13 @@ def check_type(item):
         return "No checktype provided, should be: html/hash/search"
 
 
-def lambda_handler():
+def lambda_handler(event):
     phone_nr = os.environ.get('phone_nr')
     items = scan_dynamodb("WebsiteChecktable")
     for item in items:
         check_type(item)
+    if event:
+        check_type(event)
 
 
 tuinwijck_event = {
@@ -150,6 +152,6 @@ piccardhof = {
 }
 
 if __name__ == '__main__':
-    lambda_handler()
+    lambda_handler('')
     pass
     # read_dynamodb("WebsiteChecklines", "tuinwijck")
