@@ -20,21 +20,24 @@ def hash_site(url, unchanged_hash):
         print(f"{url} changed. Notifying user")
         print(f"Current hash {currentHash} \n original hash: {unchanged_hash}")
         return currentHash
+# print(hash_site("https://www.piccardthof.nl/huisjes-te-koop/", "None"))
 
 
 def check_html(url, check_line, html_element):
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
-    current_line = str(soup.find(html_element))
+    div_element = soup.find("div", {"class": html_element})
+    hash = hashlib.sha224(str(div_element).encode('utf-8')).hexdigest()
 
-    if current_line == check_line:
+    if hash == check_line:
         print(f"No html changes detected at {url}")
         return False
     else:
         print(f"{url} changed. Notifying user")
-        print(f"Currently {url} says: {current_line}")
-        return current_line
+        print(f"Currently {url} says: {div_element}")
+        return hash
 
+# print(check_html("https://www.piccardthof.nl/huisjes-te-koop/", "None", "czr-wp-the-content"))
 
 def find_on_site(url, check_line):
     site = str(urlopen(url).read())
@@ -134,7 +137,6 @@ def lambda_handler():
         check_type(item)
 
 
-
 tuinwijck_event = {
     "check_type": "hash",
     "url": "https://www.tuinwijck.nl/huisjes-te-koop",
@@ -149,4 +151,5 @@ piccardhof = {
 
 if __name__ == '__main__':
     lambda_handler()
+    pass
     # read_dynamodb("WebsiteChecklines", "tuinwijck")
