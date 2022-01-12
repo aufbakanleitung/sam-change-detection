@@ -102,6 +102,7 @@ def write_dynamodb(url, check_type, line, html_element=None):
 def check_type(item):
     url = item["url"]
     check_type = item['check_type']
+
     # Differentiate check types: html/hash/search
     if item['check_type'] == "html":
         line = check_html(url, item['line'], item['html_element'])
@@ -153,5 +154,4 @@ piccardhof = {
 
 if __name__ == '__main__':
     lambda_handler('')
-    pass
     # read_dynamodb("WebsiteChecklines", "tuinwijck")
